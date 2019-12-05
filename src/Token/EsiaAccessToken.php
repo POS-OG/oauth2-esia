@@ -29,9 +29,9 @@ class EsiaAccessToken extends AccessToken implements ScopedTokenInterface
             return;
         }
 
-        if (!$this->parsedToken->verify(new Sha256(), new Key(file_get_contents($publicKeyPath)))) {
-            throw new InvalidArgumentException('Access token can not be verified: '.var_export($options, true));
-        }
+//        if (!$this->parsedToken->verify(new Sha256(), new Key(file_get_contents($publicKeyPath)))) {
+//            throw new InvalidArgumentException('Access token can not be verified: '.var_export($options, true));
+//        }
     }
 
     public function getScopes()
