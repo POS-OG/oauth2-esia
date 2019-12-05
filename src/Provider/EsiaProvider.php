@@ -107,6 +107,29 @@ class EsiaProvider extends AbstractProvider implements ProviderInterface
         return $this->getUrl('/aas/oauth2/te');
     }
 
+    public function getResourceOwnerOrgBranchesByToken(AccessToken $token, $orgOid, $brhsOid)
+    {
+        $response = $this->fetchResourceOwnerOrgBranches($token, $orgOid, $brhsOid);
+
+        return $this->createResourceOwner($response, $token);
+    }
+
+    public function getResourceOwnerOrg(AccessToken $token, $oid)
+    {
+        $response = $this->fetchResourceOwnerOrgDetails($token, $oid);
+
+        return $this->createResourceOwner($response, $token);
+    }
+
+    public function getResourceOwnerOrgBranchesUrl($orgOid, $brhsOid) {
+        return $this->getUrl('/rs/orgs/' . $orgOid . '/brhs/' . $brhsOid);
+    }
+
+    public function getResourceOwnerOrgDetailsUrl($oid)
+    {
+        return $this->getUrl('/rs/orgs/' . $oid);
+    }
+
     public function getResourceOwnerDetailsUrl(AccessToken $token)
     {
         $embeds = $this->getResourceOwnerEmbeds($token);
@@ -203,5 +226,28 @@ class EsiaProvider extends AbstractProvider implements ProviderInterface
         $response = ['resourceOwnerId' => $token->getResourceOwnerId()] + $response;
 
         return new GenericResourceOwner($response, 'resourceOwnerId');
+    }
+
+    /**
+     * Requests resource owner details.
+     *
+     * @param  AccessToken $token
+     * @return mixed
+     */
+    protected function fetchResourceOwnerOrgDetails(AccessToken $token, $oid)
+    {
+        $url = $this->getResourceOwnerOrgDetailsUrl($oid);
+
+        $request = $this->getAuthenticatedRequest(self::METHOD_GET, $url, $token);
+
+        $response = $this->getParsedResponse($request);
+
+        if (false === is_array($response)) {
+            throw new UnexpectedValueException(
+                'Неверный ответ, полученный от сервера авторизации. Ответ от сервера авторизации должен быть в формате JSON.'
+            );
+        }
+
+        return $response;
     }
 }

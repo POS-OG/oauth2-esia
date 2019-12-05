@@ -13,7 +13,7 @@ class OpensslCli extends Signer
         $certificatePath,
         $privateKeyPath,
         $privateKeyPassword = null,
-        $toolPath = 'openssl'
+        $toolPath = 'sudo cryptcp'
     ) {
         parent::__construct($certificatePath, $privateKeyPath, $privateKeyPassword);
         $this->toolPath = $toolPath;
@@ -21,12 +21,14 @@ class OpensslCli extends Signer
 
     public function sign($message)
     {
+
+        $messageFile = tempnam(sys_get_temp_dir(), 'messageFile');
+        $signFile = tempnam(sys_get_temp_dir(), 'signFile');
+        file_put_contents($messageFile, $message);
+
         return $this->runParameters([
-            'smime -sign -binary -outform DER -noattr',
-            '-signer '.escapeshellarg($this->certificatePath),
-            '-inkey '.escapeshellarg($this->privateKeyPath),
-            '-passin '.escapeshellarg('pass:'.$this->privateKeyPassword),
-        ], $message);
+            '-sign -pin '. escapeshellarg($this->privateKeyPassword).' '. $messageFile . ' ' . $messageFile.'.sig',
+        ], $messageFile . '.sig');
     }
 
     private function runParameters(array $parameters, $input)
@@ -47,7 +49,7 @@ class OpensslCli extends Signer
             ['pipe', 'w'], // stderr
         ], $pipes);
 
-        fwrite($pipes[0], $input);
+        fwrite($pipes[0], '');
         fclose($pipes[0]);
 
         $result = stream_get_contents($pipes[1]);
@@ -63,6 +65,7 @@ class OpensslCli extends Signer
             throw SignException::signFailedAsOf($errors, $code);
         }
 
-        return $result;
+        $signed = base64_decode(file_get_contents($input));
+        return $signed;
     }
 }
