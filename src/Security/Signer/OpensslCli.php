@@ -13,7 +13,7 @@ class OpensslCli extends Signer
         $certificatePath,
         $privateKeyPath,
         $privateKeyPassword = null,
-        $toolPath = 'sudo cryptcp'
+        $toolPath = 'sudo lxc-attach --name ubuntu1 -- openssl'
     ) {
         parent::__construct($certificatePath, $privateKeyPath, $privateKeyPassword);
         $this->toolPath = $toolPath;
