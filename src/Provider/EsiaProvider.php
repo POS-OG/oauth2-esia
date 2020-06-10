@@ -114,6 +114,13 @@ class EsiaProvider extends AbstractProvider implements ProviderInterface
         return $this->createResourceOwner($response, $token);
     }
 
+    public function getResourceOwnerOrgGrps(AccessToken $token, $orgOid)
+    {
+        $response = $this->fetchResourceOwnerOrgGrps($token, $orgOid);
+
+        return $this->createResourceOwner($response, $token);
+    }
+
     public function getResourceOwnerOrg(AccessToken $token, $oid)
     {
         $response = $this->fetchResourceOwnerOrgDetails($token, $oid);
@@ -128,6 +135,11 @@ class EsiaProvider extends AbstractProvider implements ProviderInterface
     public function getResourceOwnerOrgDetailsUrl($oid)
     {
         return $this->getUrl('/rs/orgs/' . $oid);
+    }
+
+    public function getResourceOwnerOrgGrpsUrl($oid)
+    {
+        return $this->getUrl('/rs/orgs/' . $oid . '/grps');
     }
 
     public function getResourceOwnerDetailsUrl(AccessToken $token)
@@ -237,6 +249,29 @@ class EsiaProvider extends AbstractProvider implements ProviderInterface
     protected function fetchResourceOwnerOrgDetails(AccessToken $token, $oid)
     {
         $url = $this->getResourceOwnerOrgDetailsUrl($oid);
+
+        $request = $this->getAuthenticatedRequest(self::METHOD_GET, $url, $token);
+
+        $response = $this->getParsedResponse($request);
+
+        if (false === is_array($response)) {
+            throw new UnexpectedValueException(
+                'Неверный ответ, полученный от сервера авторизации. Ответ от сервера авторизации должен быть в формате JSON.'
+            );
+        }
+
+        return $response;
+    }
+
+    /**
+     * Requests resource owner details.
+     *
+     * @param  AccessToken $token
+     * @return mixed
+     */
+    protected function fetchResourceOwnerOrgGrps(AccessToken $token, $oid)
+    {
+        $url = $this->getResourceOwnerOrgGrpsUrl($oid);
 
         $request = $this->getAuthenticatedRequest(self::METHOD_GET, $url, $token);
 
