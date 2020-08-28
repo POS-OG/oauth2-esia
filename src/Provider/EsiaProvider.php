@@ -8,6 +8,7 @@ use Ekapusta\OAuth2Esia\Interfaces\Token\ScopedTokenInterface;
 use Ekapusta\OAuth2Esia\Token\EsiaAccessToken;
 use InvalidArgumentException;
 use Lcobucci\JWT\Parsing\Encoder;
+use Lcobucci\JWT\Signer as RemoteSignerInterface;
 use League\OAuth2\Client\Grant\AbstractGrant;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
@@ -27,12 +28,17 @@ class EsiaProvider extends AbstractProvider implements ProviderInterface
 
     protected $remoteUrl = 'https://esia.gosuslugi.ru';
 
-    protected $remoteCertificatePath = self::RESOURCES.'esia.prod.cer';
+    protected $remoteCertificatePath = self::RESOURCES . 'gost.esia.prod.key';
 
     /**
      * @var SignerInterface
      */
     private $signer;
+
+    /**
+     * @var RemoteSignerInterface
+     */
+    private $remoteSigner;
 
     /**
      * @var Encoder
@@ -54,6 +60,15 @@ class EsiaProvider extends AbstractProvider implements ProviderInterface
             $this->encoder = new Encoder();
         } else {
             throw new InvalidArgumentException('Signer is not provided!');
+        }
+
+        if (isset($collaborators['remoteSigner']) && $collaborators['remoteSigner'] instanceof RemoteSignerInterface) {
+            $this->remoteSigner = $collaborators['remoteSigner'];
+        }
+
+        if (!array_key_exists('remoteSigner', $collaborators)) {
+            $this->remoteSigner = new \Ekapusta\OAuth2Esia\Security\RemoteSigner\OpensslCli();
+
         }
     }
 
@@ -230,7 +245,7 @@ class EsiaProvider extends AbstractProvider implements ProviderInterface
 
     protected function createAccessToken(array $response, AbstractGrant $grant)
     {
-        return new EsiaAccessToken($response, $this->remoteCertificatePath);
+        return new EsiaAccessToken($response, $this->remoteCertificatePath, $this->remoteSigner);
     }
 
     protected function createResourceOwner(array $response, AccessToken $token)
