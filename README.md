@@ -1,4 +1,4 @@
-ESIA Provider for OAuth 2.0 Client
+ESIA Provider for OAuth 2.0 Client v2.3
 ==================================
 
 [![Build Status](https://travis-ci.org/ekapusta/oauth2-esia.svg?branch=develop)](https://travis-ci.org/ekapusta/oauth2-esia)
