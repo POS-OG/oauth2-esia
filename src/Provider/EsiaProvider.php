@@ -68,7 +68,6 @@ class EsiaProvider extends AbstractProvider implements ProviderInterface
 
         if (!array_key_exists('remoteSigner', $collaborators)) {
             $this->remoteSigner = new \Ekapusta\OAuth2Esia\Security\RemoteSigner\OpensslCli();
-
         }
     }
 
@@ -245,7 +244,7 @@ class EsiaProvider extends AbstractProvider implements ProviderInterface
 
     protected function createAccessToken(array $response, AbstractGrant $grant)
     {
-        return new EsiaAccessToken($response, $this->remoteCertificatePath, $this->remoteSigner);
+        return new EsiaAccessToken($response);
     }
 
     protected function createResourceOwner(array $response, AccessToken $token)

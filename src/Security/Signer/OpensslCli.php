@@ -25,7 +25,7 @@ class OpensslCli extends Signer
             'smime -sign -binary -outform DER -noattr',
             '-signer '.escapeshellarg($this->certificatePath),
             '-inkey '.escapeshellarg($this->privateKeyPath),
-            '-passin '.escapeshellarg('pass:'.$this->privateKeyPassword),
+            (!empty($this->privateKeyPassword) ? '-passin '.escapeshellarg('pass:'.$this->privateKeyPassword) : ''),
         ], $message);
     }
 

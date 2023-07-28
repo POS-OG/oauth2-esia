@@ -69,6 +69,6 @@ class Factory
             ->sign(new Sha256(), new Key(file_get_contents($privateKeyPath)))
             ->getToken();
 
-        return new EsiaAccessToken(['access_token' => (string) $accessToken], $publicKeyPath);
+        return new EsiaAccessToken(['access_token' => (string) $accessToken]);
     }
 }
